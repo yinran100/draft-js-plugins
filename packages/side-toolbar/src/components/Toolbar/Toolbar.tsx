@@ -41,7 +41,7 @@ interface ToolbarProps {
   position: SideToolbarPosition;
   theme: SideToolbarPluginTheme;
   popperOptions?: PopperOptions;
-  onHoverChange?(fn: hoverChangeCallBack);
+  onHoverChange?(fn: hoverChangeCallBack): void;
   createBlockTypeSelectPopperOptions?: CreateBlockTypeSelectPopperOptionsFn;
   sideToolbarButtonComponent: ComponentType<SideToolbarButtonProps>;
 }
@@ -77,7 +77,7 @@ export default function Toolbar({
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
     null
   );
-  const [targetKey, setTargetKey] = useState(null);
+  const [targetKey, setTargetKey] = useState<string>('');
   const [buttonReferenceElement, setButtonReferenceElement] =
     useState<HTMLElement | null>(null);
 
@@ -86,7 +86,8 @@ export default function Toolbar({
       const onChangeCallBack = (dom?: HTMLDivElement): void => {
         setReferenceElement(dom || null);
         setTargetKey(
-          dom ? dom.getAttribute('data-offset-key').split('-')[0] : null
+          (dom ? dom.getAttribute('data-offset-key')?.split('-')?.[0] : '') ||
+            ''
         );
         if (!dom) setShow(false);
       };
@@ -98,7 +99,7 @@ export default function Toolbar({
       if (!selection.getHasFocus()) {
         setReferenceElement(null);
         setShow(false);
-        setTargetKey(null);
+        setTargetKey('');
         return;
       }
 

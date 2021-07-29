@@ -21,7 +21,7 @@ export interface VideoPluginConfig {
 export interface VideoPlugin extends EditorPlugin {
   addVideo: typeof addVideo;
   types: typeof types;
-  blockRendererFn?(block: ContentBlock, pluginFunctions: PluginFunctions);
+  blockRendererFn?(block: ContentBlock, pluginFunctions: PluginFunctions): void;
 }
 
 export default function videoPlugin(

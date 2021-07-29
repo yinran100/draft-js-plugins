@@ -16,13 +16,13 @@ export type { SideToolbarPluginTheme, SideToolbarButtonProps };
 
 export type SideToolbarPosition = 'left' | 'right';
 export interface hoverChangeCallBack {
-  (HTMLDivElement): void;
+  (el: HTMLDivElement): void;
 }
 export interface SideToolbarPluginConfig {
   theme?: SideToolbarPluginTheme;
   position?: SideToolbarPosition;
   popperOptions?: PopperOptions;
-  onHoverChange?(fn: hoverChangeCallBack);
+  onHoverChange?(fn: hoverChangeCallBack): void;
   sideToolbarButtonComponent?: ComponentType<SideToolbarButtonProps>;
   createBlockTypeSelectPopperOptions?: CreateBlockTypeSelectPopperOptionsFn;
 }
