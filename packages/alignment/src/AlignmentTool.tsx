@@ -59,7 +59,7 @@ export default function AlignmentTool({
             ? relativeParent.getBoundingClientRect()
             : document.body.getBoundingClientRect();
           newPosition = {
-            top: boundingRect.top - relativeRect.top - toolbarHeight,
+            top: boundingRect.top - relativeRect.top - toolbarHeight + 10,
             left:
               boundingRect.left - relativeRect.left + boundingRect.width / 2,
             transform: 'translate(-50%) scale(1)',
