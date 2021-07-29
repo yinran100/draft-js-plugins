@@ -10,6 +10,7 @@ import React, {
 // @ts-ignore
 import DraftOffsetKey from 'draft-js/lib/DraftOffsetKey';
 import { EditorState } from 'draft-js';
+import _throttle from 'lodash/throttle';
 import {
   HeadlineOneButton,
   HeadlineTwoButton,
@@ -27,6 +28,7 @@ import {
   PopperOptions,
   SideToolbarPluginStore,
   SideToolbarPosition,
+  hoverChangeCallBack,
 } from '../..';
 import Popover from './Popover';
 import { SideToolbarButtonProps } from '../BlockTypeSelect/SideToolbarButton';
@@ -39,6 +41,7 @@ interface ToolbarProps {
   position: SideToolbarPosition;
   theme: SideToolbarPluginTheme;
   popperOptions?: PopperOptions;
+  onHoverChange?(fn: hoverChangeCallBack);
   createBlockTypeSelectPopperOptions?: CreateBlockTypeSelectPopperOptionsFn;
   sideToolbarButtonComponent: ComponentType<SideToolbarButtonProps>;
 }
@@ -66,47 +69,70 @@ export default function Toolbar({
   store,
   createBlockTypeSelectPopperOptions,
   children = DefaultChildren,
+  onHoverChange,
   sideToolbarButtonComponent: SideToolbarButton,
 }: ToolbarProps): ReactElement | null {
-  const [show, setShow] = useState(false);
+  const [show, _setShow] = useState(false);
+  const setShow = useCallback(_throttle(_setShow, 100), []);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
     null
   );
+  const [targetKey, setTargetKey] = useState(null);
   const [buttonReferenceElement, setButtonReferenceElement] =
     useState<HTMLElement | null>(null);
 
-  const onEditorStateChange = useCallback((editorState?: EditorState) => {
-    const selection = editorState!.getSelection();
-    if (!selection.getHasFocus()) {
-      setReferenceElement(null);
-      setShow(false);
-      return;
-    }
+  if (onHoverChange) {
+    useEffect(() => {
+      const onChangeCallBack = (dom?: HTMLDivElement): void => {
+        setReferenceElement(dom || null);
+        setTargetKey(
+          dom ? dom.getAttribute('data-offset-key').split('-')[0] : null
+        );
+        if (!dom) setShow(false);
+      };
+      onHoverChange(onChangeCallBack);
+    }, []);
+  } else {
+    const onEditorStateChange = useCallback((editorState?: EditorState) => {
+      const selection = editorState!.getSelection();
+      if (!selection.getHasFocus()) {
+        setReferenceElement(null);
+        setShow(false);
+        setTargetKey(null);
+        return;
+      }
 
-    const currentContent = editorState!.getCurrentContent();
-    const currentBlock = currentContent.getBlockForKey(selection.getStartKey());
-    // TODO verify that always a key-0-0 exists
-    const offsetKey = DraftOffsetKey.encode(currentBlock.getKey(), 0, 0);
-    // Note: need to wait on tick to make sure the DOM node has been create by Draft.js
-    setTimeout(() => {
-      const node = document.querySelectorAll<HTMLDivElement>(
-        `[data-offset-key="${offsetKey}"]`
-      )[0];
-      setReferenceElement(node);
-    }, 0);
-  }, []);
+      const currentContent = editorState!.getCurrentContent();
+      const currentBlock = currentContent.getBlockForKey(
+        selection.getStartKey()
+      );
+      const currentKey = currentBlock.getKey();
+      // TODO verify that always a key-0-0 exists
+      const offsetKey = DraftOffsetKey.encode(currentKey, 0, 0);
+      // Note: need to wait on tick to make sure the DOM node has been create by Draft.js
+      setTimeout(() => {
+        const node = document.querySelectorAll<HTMLDivElement>(
+          `[data-offset-key="${offsetKey}"]`
+        )[0];
+        setTargetKey(currentKey);
+        setReferenceElement(node);
+      }, 0);
+    }, []);
 
-  useEffect(() => {
-    store.subscribeToItem('editorState', onEditorStateChange);
-    return () => {
-      store.unsubscribeFromItem('editorState', onEditorStateChange);
-    };
-  }, [store]);
-
-  if (referenceElement === null) {
-    //do not show popover if reference element is not there
-    return null;
+    useEffect(() => {
+      store.subscribeToItem('editorState', onEditorStateChange);
+      return () => {
+        store.unsubscribeFromItem('editorState', onEditorStateChange);
+      };
+    }, [store]);
   }
+
+  const getTargetKey = useCallback((): string => targetKey, [targetKey]);
+
+  // if (referenceElement === null) {
+  //   //do not show popover if reference element is not there
+  //   return null;
+  // }
 
   return (
     <>
@@ -118,10 +144,14 @@ export default function Toolbar({
       >
         <div
           ref={setButtonReferenceElement}
+          data-reference-show={!!referenceElement}
           onMouseEnter={() => setShow(true)}
           onMouseLeave={() => setShow(false)}
         >
           <SideToolbarButton
+            getEditorState={store.getItem('getEditorState')!}
+            setEditorState={store.getItem('setEditorState')!}
+            getTargetKey={getTargetKey}
             className={theme.blockTypeSelectStyles?.blockType}
           />
         </div>
@@ -129,6 +159,7 @@ export default function Toolbar({
       <BlockTypeSelect
         getEditorState={store.getItem('getEditorState')!}
         setEditorState={store.getItem('setEditorState')!}
+        getTargetKey={getTargetKey}
         theme={theme}
         childNodes={children}
         referenceElement={buttonReferenceElement}

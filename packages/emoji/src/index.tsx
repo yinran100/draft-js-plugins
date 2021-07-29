@@ -242,7 +242,7 @@ export default (config: EmojiPluginConfig = {}): EmojiPlugin => {
     keyBindingFn: (keyboardEvent: KeyboardEvent) =>
       callbacks.keyBindingFn && callbacks.keyBindingFn(keyboardEvent),
     handleReturn: (keyboardEvent: KeyboardEvent) =>
-      callbacks.handleReturn && callbacks.handleReturn(keyboardEvent),
+      callbacks.handleReturn ? callbacks.handleReturn(keyboardEvent) : null,
     onChange: (editorState) => {
       let newEditorState = attachImmutableEntitiesToEmojis(editorState);
       if (

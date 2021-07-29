@@ -1,6 +1,7 @@
 import { EditorState } from 'draft-js';
 import { DraftJsButtonTheme } from '@draft-js-plugins/buttons';
 import { usePopper } from 'react-popper';
+import _throttle from 'lodash/throttle';
 import React, {
   FC,
   MouseEvent,
@@ -15,6 +16,8 @@ import { PopperOptions } from '../..';
 
 export interface BlockTypeSelectChildProps {
   theme: DraftJsButtonTheme;
+  setVisible(visible: boolean): void;
+  getTargetKey(): string;
   getEditorState(): EditorState;
   setEditorState(state: EditorState): void;
 }
@@ -27,6 +30,7 @@ interface BlockTypeSelectProps {
   theme: SideToolbarPluginTheme;
   getEditorState(): EditorState;
   setEditorState(state: EditorState): void;
+  getTargetKey(): string;
   childNodes: FC<BlockTypeSelectChildProps>;
   referenceElement: HTMLElement | null;
   rootReferenceElement: HTMLElement | null;
@@ -57,6 +61,7 @@ export default function BlockTypeSelect({
   childNodes,
   referenceElement,
   show,
+  getTargetKey,
   rootReferenceElement,
   createBlockTypeSelectPopperOptions = createDefaultPopperOptions,
 }: BlockTypeSelectProps): ReactElement {
@@ -65,6 +70,8 @@ export default function BlockTypeSelect({
     clickEvent.stopPropagation();
   }, []);
 
+  const [visible, _setVisible] = useState(false);
+  const setVisible = useCallback(_throttle(_setVisible, 100), []);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
   const popperOptions = useMemo(
@@ -81,19 +88,30 @@ export default function BlockTypeSelect({
     update?.();
   }, [rootReferenceElement, update]);
 
+  const onMouseEnter = useCallback(
+    (e) => {
+      if (referenceElement?.contains(e.nativeEvent.fromElement))
+        setVisible(true);
+    },
+    [referenceElement]
+  );
   return (
     <div
       className={theme.blockTypeSelectStyles?.popup}
       ref={setPopperElement}
       style={styles.popper}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={() => setVisible(false)}
       {...attributes.popper}
-      data-show={show}
+      data-show={show || visible}
       onMouseDown={onMouseDown}
     >
       <div className={theme.blockTypeSelectStyles?.popupFrame}>
         {childNodes({
           getEditorState,
           setEditorState,
+          setVisible,
+          getTargetKey,
           theme: theme.buttonStyles!,
         })}
         <div

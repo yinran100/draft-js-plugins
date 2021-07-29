@@ -15,11 +15,14 @@ import { CreateBlockTypeSelectPopperOptionsFn } from './components/BlockTypeSele
 export type { SideToolbarPluginTheme, SideToolbarButtonProps };
 
 export type SideToolbarPosition = 'left' | 'right';
-
+export interface hoverChangeCallBack {
+  (HTMLDivElement): void;
+}
 export interface SideToolbarPluginConfig {
   theme?: SideToolbarPluginTheme;
   position?: SideToolbarPosition;
   popperOptions?: PopperOptions;
+  onHoverChange?(fn: hoverChangeCallBack);
   sideToolbarButtonComponent?: ComponentType<SideToolbarButtonProps>;
   createBlockTypeSelectPopperOptions?: CreateBlockTypeSelectPopperOptionsFn;
 }
@@ -62,6 +65,7 @@ export default (config: SideToolbarPluginConfig = {}): SideToolbarPlugin => {
     theme = defaultTheme,
     sideToolbarButtonComponent = SideToolbarButton,
     popperOptions,
+    onHoverChange,
     createBlockTypeSelectPopperOptions,
   } = config;
 
@@ -70,6 +74,7 @@ export default (config: SideToolbarPluginConfig = {}): SideToolbarPlugin => {
       {...props}
       store={store}
       theme={theme}
+      onHoverChange={onHoverChange}
       position={position}
       popperOptions={popperOptions}
       sideToolbarButtonComponent={sideToolbarButtonComponent}

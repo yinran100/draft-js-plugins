@@ -1,6 +1,5 @@
 import {
   ContentBlock,
-  DraftEditorCommand,
   DraftHandleValue,
   DraftInlineStyle,
   EditorProps,
@@ -119,7 +118,7 @@ function keyBindingFnHook(
   plugins: EditorPlugin[],
   pluginMethods: PluginFunctions
 ) {
-  return (event: KeyboardEvent): DraftEditorCommand | null => {
+  return (event: KeyboardEvent): EditorCommand | null => {
     let result: EditorCommand | null | undefined = null;
     const wasHandled = plugins.some((plugin) => {
       if (typeof plugin.keyBindingFn !== 'function') {

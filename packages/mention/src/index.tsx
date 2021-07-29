@@ -153,7 +153,8 @@ export default (
     theme = defaultTheme,
     positionSuggestions,
     mentionComponent,
-    mentionSuggestionsComponent: MentionSuggestionsComponent = MentionSuggestions,
+    mentionSuggestionsComponent:
+      MentionSuggestionsComponent = MentionSuggestions,
     entityMutability = 'SEGMENTED',
     mentionTrigger = '@',
     mentionRegExp = defaultRegExp,
@@ -217,7 +218,7 @@ export default (
     keyBindingFn: (keyboardEvent) =>
       callbacks.keyBindingFn && callbacks.keyBindingFn(keyboardEvent),
     handleReturn: (keyboardEvent) =>
-      callbacks.handleReturn && callbacks.handleReturn(keyboardEvent),
+      callbacks.handleReturn ? callbacks.handleReturn(keyboardEvent) : null,
     onChange: (editorState) => {
       if (callbacks.onChange) {
         return callbacks.onChange(editorState);

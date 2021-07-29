@@ -35,7 +35,9 @@
     "build:js": "yarn rollup --config ../../rollup.config.js",
     "build:dts": "tsc -d",
     "build:css": "node ../../scripts/build-css.js $(pwd)",
-    "test": "jest"
+    "test": "jest",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21"
   },
   "license": "MIT",
   "dependencies": {

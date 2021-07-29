@@ -10,6 +10,15 @@
     "deploy:gh-pages": "rm -rf node_modules/.cache && next build && next export && touch out/.nojekyll && git add out/ && git commit -m \"Deploy Next.js to gh-pages\" && git subtree push --prefix out origin gh-pages"
   },
   "dependencies": {
+    "@draft-js-plugins/drag-n-drop": "^4.2.1",
+    "@draft-js-plugins/emoji": "^4.5.5",
+    "@draft-js-plugins/focus": "^4.1.2",
+    "@draft-js-plugins/hashtag": "^4.2.1",
+    "@draft-js-plugins/image": "^4.1.2",
+    "@draft-js-plugins/linkify": "^4.1.1",
+    "@draft-js-plugins/mention": "^4.6.0",
+    "@draft-js-plugins/sticker": "^4.1.1",
+    "@draft-js-plugins/undo": "^4.1.1",
     "animateplus": "1.4.0",
     "clsx": "^1.1.1",
     "immutable": "^4.0.0-rc.12",

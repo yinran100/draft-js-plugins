@@ -1,7 +1,11 @@
 import React, { ReactElement } from 'react';
+import { EditorState } from 'draft-js';
 
 export interface SideToolbarButtonProps {
   className?: string;
+  getTargetKey(): string;
+  getEditorState(): EditorState;
+  setEditorState(state: EditorState): void;
 }
 
 export default function SideToolbarButton({

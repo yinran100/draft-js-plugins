@@ -1,5 +1,6 @@
 import React, { ComponentType, ReactElement } from 'react';
-import { EditorPlugin } from '@draft-js-plugins/editor';
+import { ContentBlock } from 'draft-js';
+import { EditorPlugin, PluginFunctions } from '@draft-js-plugins/editor';
 import addVideo from './video/modifiers/addVideo';
 import DefaultVideoComponent, {
   DefaultVideoComponentProps,
@@ -20,6 +21,7 @@ export interface VideoPluginConfig {
 export interface VideoPlugin extends EditorPlugin {
   addVideo: typeof addVideo;
   types: typeof types;
+  blockRendererFn?(block: ContentBlock, pluginFunctions: PluginFunctions);
 }
 
 export default function videoPlugin(
@@ -55,7 +57,6 @@ export default function videoPlugin(
           };
         }
       }
-
       return null;
     },
     addVideo,
