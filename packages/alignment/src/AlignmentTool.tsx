@@ -6,13 +6,7 @@ import React, {
   ReactElement,
   useCallback,
 } from 'react';
-import {
-  AlignBlockDefaultButton,
-  AlignBlockLeftButton,
-  AlignBlockCenterButton,
-  AlignBlockRightButton,
-  DraftJsBlockAlignmentButtonType,
-} from '@draft-js-plugins/buttons';
+import { DraftJsBlockAlignmentButtonType } from '@draft-js-plugins/buttons';
 import { AlignmentPluginTheme } from './theme';
 import { AlignmentPluginStore } from '.';
 
@@ -34,11 +28,13 @@ function getRelativeParent(element: HTMLElement | null): HTMLElement | null {
 interface AlignmentToolProps {
   theme: AlignmentPluginTheme;
   store: AlignmentPluginStore;
+  renderButtons: DraftJsBlockAlignmentButtonType[];
 }
 
 export default function AlignmentTool({
   store,
   theme,
+  renderButtons,
 }: AlignmentToolProps): ReactElement {
   const [position, setPosition] = useState({});
   const [alignment, setAlignment] = useState<string | null>(null);
@@ -59,7 +55,7 @@ export default function AlignmentTool({
             ? relativeParent.getBoundingClientRect()
             : document.body.getBoundingClientRect();
           newPosition = {
-            top: boundingRect.top - relativeRect.top - toolbarHeight + 10,
+            top: boundingRect.top - relativeRect.top - toolbarHeight - 10,
             left:
               boundingRect.left - relativeRect.left + boundingRect.width / 2,
             transform: 'translate(-50%) scale(1)',
@@ -104,20 +100,13 @@ export default function AlignmentTool({
     };
   }, [onVisibilityChanged, onAlignmentChange]);
 
-  const defaultButtons: DraftJsBlockAlignmentButtonType[] = [
-    AlignBlockDefaultButton,
-    AlignBlockLeftButton,
-    AlignBlockCenterButton,
-    AlignBlockRightButton,
-  ];
-
   return (
     <div
       className={theme.alignmentToolStyles.alignmentTool}
       style={position}
       ref={toolbar}
     >
-      {defaultButtons.map((Button, index) => (
+      {renderButtons.map((Button, index) => (
         <Button
           /* the index can be used here as the buttons list won't change */
           key={index}

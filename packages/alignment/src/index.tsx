@@ -2,33 +2,50 @@ import React, { ComponentType, ReactElement } from 'react';
 import { ContentBlock, EditorState } from 'draft-js';
 import { EditorPlugin } from '@draft-js-plugins/editor';
 import { createStore, Store } from '@draft-js-plugins/utils';
+import {
+  AlignBlockDefaultButton,
+  AlignBlockLeftButton,
+  AlignBlockCenterButton,
+  AlignBlockRightButton,
+  DraftJsBlockAlignmentButtonType,
+} from '@draft-js-plugins/buttons';
 import createDecorator from './createDecorator';
 import AlignmentTool from './AlignmentTool';
 import { defaultTheme, AlignmentPluginTheme } from './theme';
 
-const createSetAlignment = (
-  contentBlock: ContentBlock,
-  {
-    getEditorState,
-    setEditorState,
-  }: {
-    setEditorState(editorState: EditorState): void; // a function to update the EditorState
-    getEditorState(): EditorState; // a function to get the current EditorState
-  }
-) => (data: Record<string, unknown>) => {
-  const entityKey = contentBlock.getEntityAt(0);
-  if (entityKey) {
-    const editorState = getEditorState();
-    const contentState = editorState.getCurrentContent();
-    contentState.mergeEntityData(entityKey, { ...data });
-    setEditorState(
-      EditorState.forceSelection(editorState, editorState.getSelection())
-    );
-  }
-};
+const createSetAlignment =
+  (
+    contentBlock: ContentBlock,
+    {
+      getEditorState,
+      setEditorState,
+    }: {
+      setEditorState(editorState: EditorState): void; // a function to update the EditorState
+      getEditorState(): EditorState; // a function to get the current EditorState
+    }
+  ) =>
+  (data: Record<string, unknown>) => {
+    const entityKey = contentBlock.getEntityAt(0);
+    if (entityKey) {
+      const editorState = getEditorState();
+      const contentState = editorState.getCurrentContent();
+      contentState.mergeEntityData(entityKey, { ...data });
+      setEditorState(
+        EditorState.forceSelection(editorState, editorState.getSelection())
+      );
+    }
+  };
+
+const defaultButtons: DraftJsBlockAlignmentButtonType[] = [
+  AlignBlockDefaultButton,
+  AlignBlockLeftButton,
+  AlignBlockCenterButton,
+  AlignBlockRightButton,
+];
 
 interface AlignmentPluginConfig {
   theme?: AlignmentPluginTheme;
+  components?: DraftJsBlockAlignmentButtonType[];
 }
 
 interface StoreItemMap {
@@ -54,10 +71,10 @@ export default (
     isVisible: false,
   });
 
-  const { theme = defaultTheme } = config;
+  const { theme = defaultTheme, components = defaultButtons } = config;
 
   const DecoratedAlignmentTool = (): ReactElement => (
-    <AlignmentTool store={store} theme={theme} />
+    <AlignmentTool store={store} theme={theme} renderButtons={components} />
   );
 
   return {

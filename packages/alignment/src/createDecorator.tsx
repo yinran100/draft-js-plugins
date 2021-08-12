@@ -53,7 +53,12 @@ export default ({ store }: { store: AlignmentPluginStore }) =>
         } else if (store.getItem('visibleBlock') === block.getKey()) {
           store.updateItem('visibleBlock', null);
         }
-      }, [blockProps.isFocused, blockProps.isCollapsedSelection, store]);
+      }, [
+        blockProps.isFocused,
+        blockProps.isCollapsedSelection,
+        store,
+        blockProps.alignment,
+      ]);
 
       const alignment = blockProps.alignment;
       let newStyle = style;
@@ -66,6 +71,12 @@ export default ({ store }: { store: AlignmentPluginStore }) =>
           ...style,
           marginLeft: 'auto',
           marginRight: 'auto',
+          display: 'block',
+        };
+      } else if (alignment === 'onlyRight') {
+        newStyle = {
+          ...style,
+          marginLeft: 'auto',
           display: 'block',
         };
       }
